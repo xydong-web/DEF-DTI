@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scrdti"
-version = "0.1.0"
-description = "SCR-DTI: asymmetric evidence factorization for reliable drug-target prediction across data regimes."
+version = "0.2.0"
+description = "DEF-DTI: decision-level evidence factorization for drug-target interaction prediction."
 readme = "README.md"
 requires-python = ">=3.10,<3.12"
 license = {file = "LICENSE"}
@@ -30,6 +30,7 @@ chem = ["rdkit==2025.3.5"]
 dev = ["pytest>=8.2.2", "ruff>=0.5.5"]
 
 [project.scripts]
+defdti = "scrdti.defdti_cli:main"
 scrdti = "scrdti.cli:main"
 
 [tool.setuptools]

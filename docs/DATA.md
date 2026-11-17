@@ -1,4 +1,4 @@
-# Data and representations
+# SCR-DTI v0.1 data and representations
 
 The repository does not redistribute benchmark datasets or trained encoder/model
 weights. Users must obtain each source under its original terms.

@@ -1,4 +1,4 @@
-# Reproducibility
+# SCR-DTI v0.1 reproducibility
 
 ## What this repository guarantees
 

@@ -1,4 +1,4 @@
-# SCR-DTI architecture
+# SCR-DTI v0.1 legacy architecture
 
 SCR-DTI factors evidence by **decision function**.
 

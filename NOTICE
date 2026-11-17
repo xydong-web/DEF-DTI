@@ -1,9 +1,10 @@
-SCR-DTI release notice
+DEF-DTI release notice
 ======================
 
-This repository contains the paper-facing SCR-DTI implementation. It does not
-bundle trained model weights, benchmark datasets, Hugging Face model snapshots,
-or private cluster artifacts.
+This repository contains DEF-DTI pair-only HCA inference, decision-level
+fitting and replay code for Hetionet, derived fold metrics for Table 5, and the
+previous SCR-DTI implementation for compatibility. It does not bundle model
+weights, benchmark data, or pair-level research artifacts.
 
 The projection-network topology used for the pretrained molecular/protein
 representations follows the public GRAM-DTI implementation described as MIT
