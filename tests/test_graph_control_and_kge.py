@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pandas as pd
 
-from scrdti.graph_control import assert_no_heldout_direct_edges, remove_heldout_direct_edges
-from scrdti.kge import score_pairs, train_toruse
+from defdti.graph_control import assert_no_heldout_direct_edges, remove_heldout_direct_edges
+from defdti.kge import score_pairs, train_toruse
 
 
 def test_direct_and_inverse_heldout_edges_are_removed() -> None:

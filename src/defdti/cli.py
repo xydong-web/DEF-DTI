@@ -7,18 +7,18 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from scrdti.calibration import apply_temperature, fit_temperature
-from scrdti.config import load_config
-from scrdti.data import load_feature_npz, make_synthetic_npz
-from scrdti.evaluate import (
+from defdti.calibration import apply_temperature, fit_temperature
+from defdti.config import load_config
+from defdti.data import load_feature_npz, make_synthetic_npz
+from defdti.evaluate import (
     binary_metrics,
     brier_score,
     expected_calibration_error,
     negative_log_likelihood,
 )
-from scrdti.precompute import DEFAULT_ENCODERS, encode_texts
-from scrdti.preprocessing import canonicalize_smiles, normalize_protein_sequence
-from scrdti.training import (
+from defdti.precompute import DEFAULT_ENCODERS, encode_texts
+from defdti.preprocessing import canonicalize_smiles, normalize_protein_sequence
+from defdti.training import (
     load_release_checkpoint,
     predict_arrays,
     result_to_json,
@@ -137,24 +137,22 @@ def _cmd_precompute(args: argparse.Namespace) -> None:
     print(args.output)
 
 
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="scrdti")
-    sub = parser.add_subparsers(dest="command", required=True)
-
+def add_pair_commands(sub: argparse._SubParsersAction) -> None:
+    """Register feature extraction and pair-model commands."""
     synthetic = sub.add_parser("make-synthetic", help="create a tiny NPZ smoke-test dataset")
     synthetic.add_argument("--output", required=True)
     synthetic.add_argument("--n", type=int, default=96)
     synthetic.add_argument("--seed", type=int, default=7)
     synthetic.set_defaults(func=_cmd_make_synthetic)
 
-    train = sub.add_parser("train", help="train SCR-DTI from precomputed feature NPZ")
+    train = sub.add_parser("train", help="train DEF-DTI from precomputed feature NPZ")
     train.add_argument("--config", required=True)
     train.add_argument("--data", required=True)
     train.add_argument("--output", required=True)
     train.add_argument("--device", default="cpu")
     train.set_defaults(func=_cmd_train)
 
-    predict = sub.add_parser("predict", help="predict a split from precomputed feature NPZ")
+    predict = sub.add_parser("predict-pairs", help="predict a split from precomputed feature NPZ")
     predict.add_argument("--config", required=True)
     predict.add_argument("--data", required=True)
     predict.add_argument("--checkpoint", required=True)
@@ -192,15 +190,4 @@ def build_parser() -> argparse.ArgumentParser:
     precompute.add_argument("--batch-size", type=int, default=8)
     precompute.add_argument("--device", default=None)
     precompute.set_defaults(func=_cmd_precompute)
-    return parser
-
-
-def main() -> None:
-    parser = build_parser()
-    args = parser.parse_args()
-    args.func(args)
-
-
-if __name__ == "__main__":
-    main()
 

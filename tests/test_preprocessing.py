@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from scrdti.preprocessing import (
+from defdti.preprocessing import (
     assert_regime,
     audit_pair_splits,
     canonicalize_smiles,

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import torch
 
-from scrdti import ModelConfig, SCRDTI
+from defdti import ModelConfig, DEFDTI
 
 
 def tiny_config() -> ModelConfig:
@@ -36,7 +36,7 @@ def tiny_config() -> ModelConfig:
 
 def test_import_and_synthetic_forward() -> None:
     torch.manual_seed(3)
-    model = SCRDTI(tiny_config()).eval()
+    model = DEFDTI(tiny_config()).eval()
     batch = 5
     output = model(
         torch.randn(batch, 12),
@@ -58,7 +58,7 @@ def test_graph_availability_mask_is_fail_closed() -> None:
     torch.manual_seed(5)
     config = tiny_config()
     config.use_kge_refinement = False
-    model = SCRDTI(config).eval()
+    model = DEFDTI(config).eval()
     with torch.no_grad():
         assert model.graph_context is not None
         model.graph_context.logit_head.weight.fill_(2.0)
@@ -80,7 +80,7 @@ def test_graph_availability_mask_is_fail_closed() -> None:
 
 
 def test_confidence_margin_gate_decreases_with_base_margin() -> None:
-    model = SCRDTI(tiny_config()).eval()
+    model = DEFDTI(tiny_config()).eval()
     assert model.kge_refinement is not None
     gate = model.kge_refinement.confidence_gate(
         torch.tensor([0.0, 1.0, 4.0]), torch.ones(3)
@@ -91,7 +91,7 @@ def test_confidence_margin_gate_decreases_with_base_margin() -> None:
 def test_kge_residual_is_bounded_and_masked() -> None:
     torch.manual_seed(11)
     config = tiny_config()
-    model = SCRDTI(config).eval()
+    model = DEFDTI(config).eval()
     assert model.kge_refinement is not None
     with torch.no_grad():
         model.kge_refinement.adapter.base_scale.fill_(100.0)

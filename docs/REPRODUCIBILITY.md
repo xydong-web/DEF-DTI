@@ -1,4 +1,4 @@
-# SCR-DTI v0.1 reproducibility
+# Pair-model reproducibility
 
 ## What this repository guarantees
 
@@ -11,15 +11,15 @@ mapping, and a tiny CPU train-predict-evaluate flow.
 ## Basic workflow
 
 Download the source data listed in `docs/DATA.md`, convert each benchmark to a
-pair-level CSV, and run `scrdti precompute` followed by `scrdti train`,
-`scrdti predict`, and `scrdti evaluate` with the matching YAML configuration.
+pair-level CSV, and run `defdti precompute` followed by `defdti train`,
+`defdti predict-pairs`, and `defdti evaluate` with the matching YAML configuration.
 For graph/KGE experiments, prepare the fold-specific graph artifacts before
 training and include the optional arrays described in `docs/DATA.md`.
 
 ## What is intentionally external
 
 - pretrained MoLFormer, MolT5, and ESM-2 weights;
-- trained SCR-DTI checkpoints;
+- trained DEF-DTI checkpoints;
 - DrugBank and other benchmark source data;
 - precomputed embeddings and graph/KGE artifacts;
 - historical exploratory sweeps and private cluster launchers.
@@ -31,7 +31,7 @@ files in the source research tree later gained 12 parameters under
 `paper_binary_interaction_trunk` and `paper_binary_private_pair_adapter`. Those
 parameters did not exist in the saved paper checkpoints. The release compatibility
 loader therefore reconstructs the checkpoint-era prediction path and maps only
-paper-relevant weights into `SCRDTI`.
+paper-relevant weights into `DEFDTI`.
 
 The ignored legacy scaffolding includes condition encoders, latent/MoE plumbing,
 auxiliary affinity/structure heads, the pretraining IC50 classifier, and a graph
@@ -45,8 +45,8 @@ quality, the release includes validation-only temperature scaling plus Brier,
 NLL, and expected calibration error helpers. Calibration parameters must never be
 fit on test predictions.
 
-The strict graph-control helpers are provided in `scrdti.graph_control`, and the
-fold-specific TorusE implementation is in `scrdti.kge`. The default strict KGE
+The strict graph-control helpers are provided in `defdti.graph_control`, and the
+fold-specific TorusE implementation is in `defdti.kge`. The default strict KGE
 settings documented by the manuscript are 256-dimensional embeddings, 5 epochs,
 batch size 1,024, Adam with learning rate 1e-3, head/tail corruption, a negative
 ratio of 1, and seed 42. Held-out validation/test DTI pairs should be supplied to

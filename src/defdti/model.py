@@ -6,7 +6,7 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 
-from scrdti.config import ModelConfig
+from defdti.config import ModelConfig
 
 
 def _projection_mlp(
@@ -16,7 +16,7 @@ def _projection_mlp(
     mid_dim: int,
     dropout: float,
 ) -> nn.Sequential:
-    """Projector topology used by the paper-facing SCR-DTI representation path."""
+    """Projector topology used by the paper-facing DEF-DTI representation path."""
 
     return nn.Sequential(
         nn.Linear(input_dim, hidden_dim),
@@ -345,7 +345,7 @@ class ConfidenceMarginKGERefinement(nn.Module):
 
 
 @dataclass
-class SCRDTIOutput:
+class DEFDTIOutput:
     logits: torch.Tensor
     probabilities: torch.Tensor
     pair_logit: torch.Tensor
@@ -357,8 +357,8 @@ class SCRDTIOutput:
     pair_repr: torch.Tensor
 
 
-class SCRDTI(nn.Module):
-    """Paper-facing SCR-DTI predictor.
+class DEFDTI(nn.Module):
+    """Paper-facing DEF-DTI predictor.
 
     Inputs are offline pooled molecular/text/protein embeddings. Optional graph
     context and KGE scores enter only through their explicitly separated paths.
@@ -455,7 +455,7 @@ class SCRDTI(nn.Module):
         graph_available: torch.Tensor | None = None,
         kge_score: torch.Tensor | None = None,
         kge_available: torch.Tensor | None = None,
-    ) -> SCRDTIOutput:
+    ) -> DEFDTIOutput:
         smiles, text, protein = self.project(smiles_emb, text_emb, protein_emb)
         batch_size = smiles.shape[0]
         text_mask = self._mask(has_text, batch_size, smiles)
@@ -490,7 +490,7 @@ class SCRDTI(nn.Module):
                 kge_score,
                 kge_mask,
             )
-        return SCRDTIOutput(
+        return DEFDTIOutput(
             logits=logits,
             probabilities=torch.sigmoid(logits),
             pair_logit=pair_logit,

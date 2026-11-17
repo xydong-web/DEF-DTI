@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import numpy as np
 
-from scrdti.calibration import apply_temperature, fit_temperature
-from scrdti.evaluate import negative_log_likelihood
+from defdti.calibration import apply_temperature, fit_temperature
+from defdti.evaluate import negative_log_likelihood
 
 
 def test_validation_only_temperature_scaling_is_well_formed() -> None:

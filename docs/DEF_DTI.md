@@ -41,7 +41,7 @@ embeddings, run the models on aligned batches with PyTorch:
 
 ```python
 import torch
-from scrdti.defdti_pair import load_pair_predictor
+from defdti.defdti_pair import load_pair_predictor
 
 models = [load_pair_predictor(state) for state in (state42, state43, state44)]
 with torch.inference_mode():
@@ -65,7 +65,7 @@ one fold. The required validation label column is `label`. Keep pair IDs and
 fold membership unchanged when exporting scores.
 
 ```python
-from scrdti.defdti import fit_base
+from defdti.defdti import fit_base
 
 columns = ["z"] + [f"g{i}" for i in range(16)]  # warm-start
 # For compound-disjoint or target-disjoint, use ["z", "eh"].

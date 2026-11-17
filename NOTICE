@@ -2,13 +2,13 @@ DEF-DTI release notice
 ======================
 
 This repository contains DEF-DTI pair-only HCA inference, decision-level
-fitting and replay code for Hetionet, derived fold metrics for Table 5, and the
-previous SCR-DTI implementation for compatibility. It does not bundle model
+fitting and replay code for Hetionet, derived fold metrics for Table 5, and
+tools for reading historical model checkpoints. It does not bundle model
 weights, benchmark data, or pair-level research artifacts.
 
 The projection-network topology used for the pretrained molecular/protein
 representations follows the public GRAM-DTI implementation described as MIT
-licensed by its authors. SCR-DTI reimplements only the small projector topology
+licensed by its authors. DEF-DTI reimplements only the small projector topology
 needed by the paper-facing model; the GRAM-DTI repository itself is not vendored.
 
 The optional representation-precomputation command refers to the public model

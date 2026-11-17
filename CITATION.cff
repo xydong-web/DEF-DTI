@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "Cite this software when using the code and the DEF-DTI manuscript when citing the revised method or results."
-title: "DEF-DTI and SCR-DTI software"
+title: "DEF-DTI software"
 type: software
 version: 0.2.0
 repository-code: "https://github.com/xydong-web/DEF-DTI"

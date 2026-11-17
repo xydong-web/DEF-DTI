@@ -9,8 +9,7 @@ The revised manuscript uses OptimusKG V3.2 for KGE on all seven benchmarks.
 
 This package includes the pair-only HCA inference path, decision-level fitting
 and scoring for the revised Hetionet benchmark, and the fold metrics for its
-Table 5. The previous `scrdti` interface remains available for older checkouts
-and checkpoints.
+Table 5.
 
 ## Install and verify
 
@@ -42,11 +41,11 @@ inputs described in the workflow guide. These artifacts are not bundled.
 The supplied metrics and commands cover the DEF-DTI row of Table 5, not
 end-to-end replay of all seven benchmarks or the manuscript figures.
 
-## Use the previous release
+## Work with pair models and checkpoints
 
-The [SCR-DTI v0.1 guide](docs/LEGACY_SCR_DTI.md) documents the `scrdti` CLI,
-original configurations, and checkpoint compatibility. Its graph-context head
-and bounded residual describe the previous release.
+The [pair model workflow](docs/PAIR_MODEL_WORKFLOW.md) covers feature extraction,
+pair-model commands, and historical checkpoints. Use the Hetionet guide above
+for the revised decision stage.
 
 See [CITATION.cff](CITATION.cff) for citation details and [NOTICE](NOTICE) for
 third-party code and data terms.

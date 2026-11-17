@@ -1,6 +1,8 @@
-# SCR-DTI v0.1 legacy architecture
+# Historical pair-model architecture
 
-SCR-DTI factors evidence by **decision function**.
+This document describes the architecture used by the historical pair-model
+checkpoints. For the revised DEF-DTI decision stage, see [the Hetionet
+workflow](DEF_DTI.md).
 
 ## 1. Pair-semantic evidence
 
@@ -11,7 +13,7 @@ tokens. The pair logit is the sum of a direct molecule-protein head and an HCA
 pair-token head.
 
 The release keeps the historical projector and HCA topology required for paper
-checkpoint compatibility, but exposes it as the paper-facing `SCRDTI` API.
+checkpoint compatibility, but exposes it as the paper-facing `DEFDTI` API.
 
 ## 2. Independent graph-context support
 

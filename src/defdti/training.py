@@ -11,10 +11,11 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
-from scrdti.config import ReleaseConfig
-from scrdti.data import FeatureArrays, FeatureDataset, load_feature_npz
-from scrdti.evaluate import binary_metrics
-from scrdti.model import SCRDTI
+from defdti import __version__
+from defdti.config import ReleaseConfig
+from defdti.data import FeatureArrays, FeatureDataset, load_feature_npz
+from defdti.evaluate import binary_metrics
+from defdti.model import DEFDTI
 
 
 @dataclass
@@ -35,7 +36,7 @@ def _batch_to_device(batch: dict[str, torch.Tensor], device: torch.device) -> di
     return {key: value.to(device) for key, value in batch.items()}
 
 
-def _model_forward(model: SCRDTI, batch: dict[str, torch.Tensor]):
+def _model_forward(model: DEFDTI, batch: dict[str, torch.Tensor]):
     return model(
         batch["smiles"],
         batch["text"],
@@ -49,7 +50,7 @@ def _model_forward(model: SCRDTI, batch: dict[str, torch.Tensor]):
 
 
 def _evaluate_loader(
-    model: SCRDTI,
+    model: DEFDTI,
     loader: DataLoader,
     device: torch.device,
 ) -> tuple[dict[str, float], np.ndarray, np.ndarray, np.ndarray]:
@@ -93,7 +94,7 @@ def train_model(
         batch_size=config.train.batch_size,
         shuffle=False,
     )
-    model = SCRDTI(config.model).to(device_obj)
+    model = DEFDTI(config.model).to(device_obj)
     if model.kge_refinement is not None and train_arrays.kge_score is not None:
         if train_arrays.kge_available is None:
             active_kge = np.ones(len(train_arrays), dtype=bool)
@@ -174,7 +175,7 @@ def train_model(
             "train_config": config.train.to_dict(),
             "best_epoch": best_epoch,
             "best_validation_auprc": best_score,
-            "release": "SCR-DTI 0.1.0",
+            "release": f"DEF-DTI {__version__}",
         },
         output_path,
     )
@@ -200,20 +201,20 @@ def load_release_checkpoint(
     checkpoint_path: str | Path,
     *,
     map_location: str | torch.device = "cpu",
-) -> tuple[SCRDTI, dict[str, Any]]:
+) -> tuple[DEFDTI, dict[str, Any]]:
     payload = torch.load(Path(checkpoint_path), map_location=map_location, weights_only=False)
     if not isinstance(payload, dict) or "model" not in payload or "model_config" not in payload:
-        raise ValueError("Not an SCR-DTI release checkpoint")
-    from scrdti.config import ModelConfig
+        raise ValueError("Not a DEF-DTI release checkpoint")
+    from defdti.config import ModelConfig
 
-    model = SCRDTI(ModelConfig(**payload["model_config"]))
+    model = DEFDTI(ModelConfig(**payload["model_config"]))
     model.load_state_dict(payload["model"], strict=True)
     model.to(torch.device(map_location))
     return model, payload
 
 
 def predict_arrays(
-    model: SCRDTI,
+    model: DEFDTI,
     arrays: FeatureArrays,
     *,
     split_id: int = 2,

@@ -4,10 +4,11 @@ from pathlib import Path
 
 import pandas as pd
 
-from scrdti.config import load_config
-from scrdti.data import load_feature_npz, make_synthetic_npz
-from scrdti.evaluate import binary_metrics
-from scrdti.training import load_release_checkpoint, predict_arrays, train_from_npz
+from defdti import __version__
+from defdti.config import load_config
+from defdti.data import load_feature_npz, make_synthetic_npz
+from defdti.evaluate import binary_metrics
+from defdti.training import load_release_checkpoint, predict_arrays, train_from_npz
 
 
 def test_tiny_cpu_train_checkpoint_predict_evaluate(tmp_path: Path) -> None:
@@ -19,7 +20,7 @@ def test_tiny_cpu_train_checkpoint_predict_evaluate(tmp_path: Path) -> None:
     assert checkpoint_path.is_file()
     assert result.best_epoch >= 1
     model, payload = load_release_checkpoint(checkpoint_path)
-    assert payload["release"].startswith("SCR-DTI")
+    assert payload["release"] == f"DEF-DTI {__version__}"
     predictions = predict_arrays(model, load_feature_npz(data_path), split_id=2, device="cpu")
     frame = pd.DataFrame(predictions)
     assert not frame.empty

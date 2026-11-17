@@ -1,4 +1,4 @@
-name: scrdti
+name: defdti
 channels:
   - pytorch
   - nvidia

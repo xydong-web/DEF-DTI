@@ -8,16 +8,16 @@ import numpy as np
 import pandas as pd
 import torch
 
-from scrdti import ModelConfig, SCRDTI
-from scrdti.defdti import Residual, aggregate_hetionet, fit_base, fit_hetionet_residual, predict
-from scrdti.defdti_cli import fit, score
-from scrdti.defdti_pair import load_pair_predictor
+from defdti import ModelConfig, DEFDTI
+from defdti.defdti import Residual, aggregate_hetionet, fit_base, fit_hetionet_residual, predict
+from defdti.defdti_cli import fit, score
+from defdti.defdti_pair import load_pair_predictor
 
 
 class TestDEFDTI(unittest.TestCase):
     def test_pair_only_checkpoint_load_requires_complete_hca_path(self):
         config = ModelConfig(use_graph_context=False, use_kge_refinement=False)
-        original = SCRDTI(config).eval()
+        original = DEFDTI(config).eval()
         state = original.state_dict()
         loaded = load_pair_predictor(state)
         inputs = tuple(torch.randn(2, dim) for dim in (768, 768, 1280))
@@ -26,7 +26,7 @@ class TestDEFDTI(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             load_pair_predictor({k: v for k, v in state.items() if k != "hca.type_embeddings"})
         with self.assertRaisesRegex(ValueError, "Unexpected active parameter"):
-            load_pair_predictor(SCRDTI(replace(config, use_graph_context=True)).state_dict())
+            load_pair_predictor(DEFDTI(replace(config, use_graph_context=True)).state_dict())
 
     def test_masks_and_held_out_target_recipe(self):
         base = np.array([-2.0, 0.0, 2.0])

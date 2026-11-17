@@ -7,19 +7,19 @@ from pathlib import Path
 import pytest
 import torch
 
-from scrdti import ModelConfig, SCRDTI
-from scrdti.compat import load_legacy_checkpoint
+from defdti import ModelConfig, DEFDTI
+from defdti.compat import load_legacy_checkpoint
 
 
 pytestmark = pytest.mark.skipif(
-    not (os.environ.get("SCRDTI_ORIGINAL_ROOT") and os.environ.get("SCRDTI_LEGACY_CHECKPOINT")),
+    not (os.environ.get("DEFDTI_ORIGINAL_ROOT") and os.environ.get("DEFDTI_LEGACY_CHECKPOINT")),
     reason="requires original research tree plus historical paper checkpoint",
 )
 
 
 def test_clean_public_model_matches_original_drugbank_binary_logits() -> None:
-    original_root = Path(os.environ["SCRDTI_ORIGINAL_ROOT"]).resolve()
-    checkpoint = Path(os.environ["SCRDTI_LEGACY_CHECKPOINT"]).resolve()
+    original_root = Path(os.environ["DEFDTI_ORIGINAL_ROOT"]).resolve()
+    checkpoint = Path(os.environ["DEFDTI_LEGACY_CHECKPOINT"]).resolve()
     sys.path.insert(0, str(original_root / "src"))
     try:
         from smhdti.cli.model_kwargs import build_task_conditioned_moe_kwargs
@@ -46,7 +46,7 @@ def test_clean_public_model_matches_original_drugbank_binary_logits() -> None:
         source_payload = torch.load(checkpoint, map_location="cpu", weights_only=False)
         original.load_state_dict(source_payload["model"], strict=True)
 
-        public = SCRDTI(ModelConfig.historical_checkpoint()).eval()
+        public = DEFDTI(ModelConfig.historical_checkpoint()).eval()
         report = load_legacy_checkpoint(public, source_payload)
         assert report.core_complete
 

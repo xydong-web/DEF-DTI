@@ -9,7 +9,7 @@ import yaml
 
 @dataclass
 class ModelConfig:
-    """Paper-facing SCR-DTI model configuration.
+    """Paper-facing DEF-DTI model configuration.
 
     The default dimensions reproduce the historical paper-checkpoint representation path.
     Smaller values can be used for CPU smoke tests or method development.

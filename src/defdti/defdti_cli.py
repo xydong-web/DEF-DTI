@@ -10,7 +10,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from scrdti.defdti import REGIMES, Residual, aggregate_hetionet, fit_hetionet_residual, predict
+from defdti.cli import add_pair_commands
+from defdti.defdti import REGIMES, Residual, aggregate_hetionet, fit_hetionet_residual, predict
 
 INPUTS = ["base_logit", "kge_score", "covered"]
 IDS = ["molecule_id", "protein_id"]
@@ -107,6 +108,7 @@ def main() -> None:
     command.add_argument("--fold-metrics", type=Path, required=True)
     command.add_argument("--output", type=Path)
     command.set_defaults(func=summary)
+    add_pair_commands(sub)
     args = parser.parse_args()
     try:
         args.func(args)

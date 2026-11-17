@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import average_precision_score, roc_auc_score
 
-from scrdti.defdti import Residual, aggregate_hetionet, fit_base, fit_hetionet_residual, predict
+from defdti.defdti import Residual, aggregate_hetionet, fit_base, fit_hetionet_residual, predict
 
 REGIMES = {
     "warm_start": "warm-start",

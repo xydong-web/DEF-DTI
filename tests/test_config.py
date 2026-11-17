@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from scrdti.config import load_config
+from defdti.config import load_config
 
 
 def test_all_release_configs_parse() -> None:

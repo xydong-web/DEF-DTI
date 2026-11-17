@@ -6,11 +6,11 @@ from pathlib import Path
 import pytest
 import torch
 
-from scrdti import ModelConfig, SCRDTI
-from scrdti.compat import load_legacy_checkpoint
+from defdti import ModelConfig, DEFDTI
+from defdti.compat import load_legacy_checkpoint
 
 
-def _fake_legacy_from_public(model: SCRDTI) -> dict[str, object]:
+def _fake_legacy_from_public(model: DEFDTI) -> dict[str, object]:
     reverse_prefixes = (
         ("smiles_projector.", "semantic_backbone.reference.smiles_projector."),
         ("text_projector.", "semantic_backbone.reference.text_projector."),
@@ -43,9 +43,9 @@ def _fake_legacy_from_public(model: SCRDTI) -> dict[str, object]:
 
 def test_legacy_mapper_populates_clean_public_path() -> None:
     torch.manual_seed(13)
-    source = SCRDTI(ModelConfig.historical_checkpoint())
+    source = DEFDTI(ModelConfig.historical_checkpoint())
     payload = _fake_legacy_from_public(source)
-    target = SCRDTI(ModelConfig.historical_checkpoint())
+    target = DEFDTI(ModelConfig.historical_checkpoint())
     report = load_legacy_checkpoint(target, payload)
     assert report.core_complete
     assert report.ignored_keys == 2
@@ -54,12 +54,12 @@ def test_legacy_mapper_populates_clean_public_path() -> None:
 
 
 @pytest.mark.skipif(
-    not os.environ.get("SCRDTI_LEGACY_CHECKPOINT"),
-    reason="set SCRDTI_LEGACY_CHECKPOINT to validate a real historical checkpoint",
+    not os.environ.get("DEFDTI_LEGACY_CHECKPOINT"),
+    reason="set DEFDTI_LEGACY_CHECKPOINT to validate a real historical checkpoint",
 )
 def test_real_historical_checkpoint_maps_completely() -> None:
-    checkpoint = Path(os.environ["SCRDTI_LEGACY_CHECKPOINT"])
-    model = SCRDTI(ModelConfig.historical_checkpoint())
+    checkpoint = Path(os.environ["DEFDTI_LEGACY_CHECKPOINT"])
+    model = DEFDTI(ModelConfig.historical_checkpoint())
     report = load_legacy_checkpoint(model, checkpoint)
     assert report.core_complete
     assert report.source_keys == 206

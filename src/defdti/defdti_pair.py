@@ -6,14 +6,14 @@ from collections.abc import Mapping
 
 import torch
 
-from scrdti.compat.legacy import _map_key
-from scrdti.config import ModelConfig
-from scrdti.model import SCRDTI
+from defdti.compat.legacy import _map_key
+from defdti.config import ModelConfig
+from defdti.model import DEFDTI
 
 
-def load_pair_predictor(state: Mapping[str, torch.Tensor]) -> SCRDTI:
+def load_pair_predictor(state: Mapping[str, torch.Tensor]) -> DEFDTI:
     """Load the active pair path from a release or original pair-only state dict."""
-    model = SCRDTI(ModelConfig(use_graph_context=False, use_kge_refinement=False))
+    model = DEFDTI(ModelConfig(use_graph_context=False, use_kge_refinement=False))
     expected = model.state_dict().keys()
     active_modules = {key.split(".", 1)[0] for key in expected}
     active_modules.update(("graph_context", "kge_refinement"))

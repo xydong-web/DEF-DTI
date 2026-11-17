@@ -1,13 +1,8 @@
-# SCR-DTI v0.1 legacy workflow
+# Pair models and feature workflows
 
-This guide documents the previous release and its `scrdti` commands.
-See the [current README](../README.md) for the DEF-DTI revision.
-
-**Asymmetric Evidence Factorization for Reliable Drug-Target Prediction Across Data Regimes**
-
-SCR-DTI is the paper-facing implementation of a drug-target interaction (DTI)
-model that assigns heterogeneous evidence different decision roles instead of
-treating all sources as interchangeable fusion inputs.
+This guide covers feature extraction, pair-model training, and historical
+checkpoint compatibility. For the current DEF-DTI decision-stage workflow,
+see [Reproduce the Hetionet decision stage](DEF_DTI.md).
 
 The released model has three explicit stages:
 
@@ -54,18 +49,18 @@ Generate a tiny feature dataset, train, predict, and evaluate without downloadin
 any pretrained model or benchmark data:
 
 ```bash
-scrdti make-synthetic --output /tmp/scrdti_demo.npz --n 96 --seed 7
-scrdti train --config configs/examples/tiny_cpu.yaml \
-  --data /tmp/scrdti_demo.npz --output /tmp/scrdti_demo.pt
-scrdti predict --config configs/examples/tiny_cpu.yaml \
-  --data /tmp/scrdti_demo.npz --checkpoint /tmp/scrdti_demo.pt \
-  --output /tmp/scrdti_predictions.csv
-scrdti evaluate --predictions /tmp/scrdti_predictions.csv
+defdti make-synthetic --output /tmp/defdti_demo.npz --n 96 --seed 7
+defdti train --config configs/examples/tiny_cpu.yaml \
+  --data /tmp/defdti_demo.npz --output /tmp/defdti_demo.pt
+defdti predict-pairs --config configs/examples/tiny_cpu.yaml \
+  --data /tmp/defdti_demo.npz --checkpoint /tmp/defdti_demo.pt \
+  --output /tmp/defdti_predictions.csv
+defdti evaluate --predictions /tmp/defdti_predictions.csv
 ```
 
 ## Paper-scale inputs
 
-SCR-DTI consumes **offline pooled embeddings**:
+DEF-DTI consumes **offline pooled embeddings**:
 
 - canonical SMILES: `ibm-research/MoLFormer-XL-both-10pct`;
 - `SMILES=`-prefixed molecular text: `laituan245/molt5-base`;
@@ -73,7 +68,7 @@ SCR-DTI consumes **offline pooled embeddings**:
 
 The paper uses attention-mask-aware mean pooling. Molecular inputs are limited to
 256 tokens and protein inputs to 1,024 residues. Encoder weights are not bundled.
-See `docs/DATA.md` and `scrdti precompute --help`.
+See `docs/DATA.md` and `defdti precompute --help`.
 
 ## End-to-end reproduction
 
@@ -135,7 +130,7 @@ Install the optional encoder dependencies, then run `precompute`:
 ```bash
 python -m pip install -e ".[encoders,chem,dev]"
 
-scrdti precompute \
+defdti precompute \
   --input data/davis_pairs.csv \
   --output data/davis_features.npz \
   --smiles-column smiles \
@@ -164,13 +159,13 @@ Choose the configuration matching the benchmark and split regime:
 
 ```bash
 # Example: Davis pairwise-random
-scrdti train \
+defdti train \
   --config configs/paper/davis.yaml \
   --data data/davis_features.npz \
   --output runs/davis/checkpoint.pt \
   --device cuda
 
-scrdti predict \
+defdti predict-pairs \
   --config configs/paper/davis.yaml \
   --data data/davis_features.npz \
   --checkpoint runs/davis/checkpoint.pt \
@@ -178,7 +173,7 @@ scrdti predict \
   --split 2 \
   --device cuda
 
-scrdti evaluate \
+defdti evaluate \
   --predictions runs/davis/test_predictions.csv
 ```
 
@@ -189,7 +184,7 @@ test split. If calibration is required, first write validation and test
 prediction CSVs and run:
 
 ```bash
-scrdti calibrate \
+defdti calibrate \
   --validation runs/davis/valid_predictions.csv \
   --test runs/davis/test_predictions.csv \
   --output runs/davis/test_calibrated.csv
@@ -211,7 +206,7 @@ Hetionet runs require additional fold-specific graph-context and KGE arrays.
 For `strict_direct_edge_removed`, remove validation/test direct DTI edges and
 their inverse triples before KGE training, and exclude held-out positives from
 negative sampling. The public code provides the controls in
-`scrdti.graph_control` and the TorusE implementation in `scrdti.kge`; it does
+`defdti.graph_control` and the TorusE implementation in `defdti.kge`; it does
 not build a Hetionet fold from a raw graph automatically.
 
 ### Reproducibility checklist
@@ -223,13 +218,13 @@ metric is AUPRC; AUROC is complementary. The release smoke test remains useful
 for validating an installation without external data:
 
 ```bash
-scrdti make-synthetic --output /tmp/scrdti_demo.npz --n 96 --seed 7
-scrdti train --config configs/examples/tiny_cpu.yaml \
-  --data /tmp/scrdti_demo.npz --output /tmp/scrdti_demo.pt
-scrdti predict --config configs/examples/tiny_cpu.yaml \
-  --data /tmp/scrdti_demo.npz --checkpoint /tmp/scrdti_demo.pt \
-  --output /tmp/scrdti_predictions.csv
-scrdti evaluate --predictions /tmp/scrdti_predictions.csv
+defdti make-synthetic --output /tmp/defdti_demo.npz --n 96 --seed 7
+defdti train --config configs/examples/tiny_cpu.yaml \
+  --data /tmp/defdti_demo.npz --output /tmp/defdti_demo.pt
+defdti predict-pairs --config configs/examples/tiny_cpu.yaml \
+  --data /tmp/defdti_demo.npz --checkpoint /tmp/defdti_demo.pt \
+  --output /tmp/defdti_predictions.csv
+defdti evaluate --predictions /tmp/defdti_predictions.csv
 ```
 
 ## Paper configurations
@@ -254,16 +249,16 @@ appeared in development YAML files but were absent at training time:
 The clean public model does not expose those post-training drift modules. Use:
 
 ```python
-from scrdti import SCRDTI, ModelConfig
-from scrdti.compat import load_legacy_checkpoint
+from defdti import DEFDTI, ModelConfig
+from defdti.compat import load_legacy_checkpoint
 
-model = SCRDTI(ModelConfig.historical_checkpoint())
+model = DEFDTI(ModelConfig.historical_checkpoint())
 report = load_legacy_checkpoint(model, "legacy_multitask_best.pt")
 print(report)
 ```
 
 The compatibility layer maps only the modules that contribute to the released
-paper-facing SCR-DTI prediction path and reports ignored historical scaffolding.
+paper-facing DEF-DTI prediction path and reports ignored historical scaffolding.
 It never rewrites the source checkpoint.
 
 ## Reproducibility boundaries
@@ -273,7 +268,7 @@ It never rewrites the source checkpoint.
   default (capped at 12 unless overridden).
 - KGE standardization statistics are estimated from available training-partition
   KGE scores and stored in the checkpoint state.
-- Validation-only temperature scaling is provided in `scrdti.calibration`.
+- Validation-only temperature scaling is provided in `defdti.calibration`.
 - AUPRC is the primary ranking endpoint; AUROC is complementary.
 - DrugBank and other data must be obtained under their original licenses.
 - No bundled weight means cloning this repository alone does not reproduce the
@@ -300,13 +295,13 @@ python -m pip install -e ".[encoders,chem,dev]"
 ### 2. Run the verified CPU smoke test
 
 ```bash
-scrdti make-synthetic --output runs/synthetic.npz --n 96 --seed 7
-scrdti train --config configs/examples/tiny_cpu.yaml \
+defdti make-synthetic --output runs/synthetic.npz --n 96 --seed 7
+defdti train --config configs/examples/tiny_cpu.yaml \
   --data runs/synthetic.npz --output runs/synthetic.pt --device cpu
-scrdti predict --config configs/examples/tiny_cpu.yaml \
+defdti predict-pairs --config configs/examples/tiny_cpu.yaml \
   --data runs/synthetic.npz --checkpoint runs/synthetic.pt \
   --output runs/synthetic_predictions.csv --split 2 --device cpu
-scrdti evaluate --predictions runs/synthetic_predictions.csv
+defdti evaluate --predictions runs/synthetic_predictions.csv
 ```
 
 This is an installation smoke test, not a paper benchmark.
@@ -317,15 +312,15 @@ Create one pair-level CSV with `smiles`, `protein_sequence`, `label`, and
 `split`. Use `split=0` for train, `1` for validation, and `2` for test. Then:
 
 ```bash
-scrdti precompute --input data/pairs.csv --output data/pairs.npz \
+defdti precompute --input data/pairs.csv --output data/pairs.npz \
   --smiles-column smiles --protein-column protein_sequence \
   --label-column label --split-column split --batch-size 8
-scrdti train --config configs/paper/drugbank.yaml \
+defdti train --config configs/paper/drugbank.yaml \
   --data data/pairs.npz --output runs/drugbank.pt --device cuda
-scrdti predict --config configs/paper/drugbank.yaml \
+defdti predict-pairs --config configs/paper/drugbank.yaml \
   --data data/pairs.npz --checkpoint runs/drugbank.pt \
   --output runs/drugbank_test.csv --split 2 --device cuda
-scrdti evaluate --predictions runs/drugbank_test.csv
+defdti evaluate --predictions runs/drugbank_test.csv
 ```
 
 `precompute` downloads the three Hugging Face encoder weights on first use.

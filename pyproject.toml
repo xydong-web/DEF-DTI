@@ -3,7 +3,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "scrdti"
+name = "def-dti"
 version = "0.2.0"
 description = "DEF-DTI: decision-level evidence factorization for drug-target interaction prediction."
 readme = "README.md"
@@ -30,8 +30,7 @@ chem = ["rdkit==2025.3.5"]
 dev = ["pytest>=8.2.2", "ruff>=0.5.5"]
 
 [project.scripts]
-defdti = "scrdti.defdti_cli:main"
-scrdti = "scrdti.cli:main"
+defdti = "defdti.defdti_cli:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

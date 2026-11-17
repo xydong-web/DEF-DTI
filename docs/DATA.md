@@ -1,4 +1,4 @@
-# SCR-DTI v0.1 data and representations
+# Data and representations for pair models
 
 The repository does not redistribute benchmark datasets or trained encoder/model
 weights. Users must obtain each source under its original terms.
@@ -17,7 +17,7 @@ Use the following source pages and check their current licenses before use:
 | MolT5 | [Hugging Face](https://huggingface.co/laituan245/molt5-base) | `SMILES=` molecular-text embeddings |
 | ESM-2 | [Hugging Face](https://huggingface.co/facebook/esm2_t33_650M_UR50D) | protein-sequence embeddings |
 
-`scrdti precompute` downloads the three Hugging Face models automatically.
+`defdti precompute` downloads the three Hugging Face models automatically.
 Benchmark downloads are intentionally manual because DrugBank is licensed data
 and the other benchmarks use different identifiers and redistribution terms.
 Keep raw files outside Git and record source version, checksum, and license.
@@ -58,7 +58,7 @@ Optional relational fields are:
 
 The built-in `make-synthetic` command produces this format for smoke testing.
 
-`scrdti precompute` writes `smiles`, `text`, `protein`, `labels`, `split`, and
+`defdti precompute` writes `smiles`, `text`, `protein`, `labels`, `split`, and
 `has_text`. It does not generate `graph_context`, `kge_score`, or their masks;
 those optional arrays must come from the graph/KGE preparation pipeline.
 

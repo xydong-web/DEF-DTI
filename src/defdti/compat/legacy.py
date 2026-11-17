@@ -6,7 +6,7 @@ from typing import Any, Mapping
 
 import torch
 
-from scrdti.model import SCRDTI
+from defdti.model import DEFDTI
 
 
 @dataclass(frozen=True)
@@ -71,7 +71,7 @@ def _ignored_prefix(key: str) -> str:
 
 
 def load_legacy_checkpoint(
-    model: SCRDTI,
+    model: DEFDTI,
     checkpoint: str | Path | Mapping[str, Any],
     *,
     map_location: str | torch.device = "cpu",
@@ -81,7 +81,7 @@ def load_legacy_checkpoint(
 
     Historical checkpoints include multitask/experimental scaffolding that is
     intentionally absent from the clean release. This function maps only weights
-    that participate in the released SCR-DTI prediction path, validates shape and
+    that participate in the released DEF-DTI prediction path, validates shape and
     completeness, and reports ignored prefixes.
     """
 
@@ -121,7 +121,7 @@ def load_legacy_checkpoint(
     )
     if strict_core and not report.core_complete:
         raise RuntimeError(
-            "Legacy checkpoint did not fully populate the clean SCR-DTI prediction path: "
+            "Legacy checkpoint did not fully populate the clean DEF-DTI prediction path: "
             f"missing={list(missing)}, unexpected={list(unexpected)}"
         )
     return report
