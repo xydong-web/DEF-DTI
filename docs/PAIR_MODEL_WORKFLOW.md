@@ -1,7 +1,7 @@
 # Pair models and feature workflows
 
-This guide covers feature extraction, pair-model training, and historical
-checkpoint compatibility. For the current DEF-DTI decision-stage workflow,
+This guide covers feature extraction, the historical pair-model training
+templates, and checkpoint compatibility. For the current DEF-DTI decision-stage workflow,
 see [Reproduce the Hetionet decision stage](DEF_DTI.md).
 
 The released model has three explicit stages:
@@ -32,13 +32,14 @@ python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 ```
 
-For raw-sequence embedding extraction, install the optional encoder stack:
+For raw-sequence embedding extraction, install the optional encoder stack with
+a PyTorch 2.6 build:
 
 ```bash
 python -m pip install -e ".[encoders,chem,dev]"
 ```
 
-The verified source environment used Python 3.10.14, PyTorch 2.3.1+cu121,
+The historical research environment used Python 3.10.14, PyTorch 2.3.1+cu121,
 Transformers 4.57.3, RDKit 2025.3.5, NumPy 1.26.4, pandas 2.0.0, SciPy 1.15.3,
 scikit-learn 1.7.1, PyArrow 22.0.0, and PyYAML 6.0.2. CPU-only PyTorch is fully
 supported by the release tests.
@@ -75,30 +76,14 @@ See `docs/DATA.md` and `defdti precompute --help`.
 The release is intentionally data-free. Reproduction therefore has four
 separate stages: obtain the benchmark source, convert it to the release CSV
 schema, extract the three frozen encoder representations, and train/evaluate
-from the resulting NPZ file. The repository does not silently download data or
-model weights.
+from the resulting NPZ file. Benchmark downloads are manual, and the feature
+extractor downloads the default encoder weights on first use.
 
 ### 1. Obtain the benchmark data
 
-Use the original source whenever access is available. The following table lists
-the public entry points used to obtain the benchmark families documented in
-`configs/paper/`:
-
-| Benchmark | Download/source | Access note |
-| --- | --- | --- |
-| DrugBank | [DrugBank datasets](https://go.drugbank.com/releases/latest#datasets) | Registration and the DrugBank license are required. Do not redistribute the downloaded files. |
-| Davis | [Therapeutics Data Commons (TDC) DTI tasks](https://tdcommons.ai/multi_pred_tasks/drug_target_interaction/) | TDC provides a programmatic loader and standardized identifiers. |
-| KIBA | [TDC DTI tasks](https://tdcommons.ai/multi_pred_tasks/drug_target_interaction/) or the original KIBA release cited by TDC | Preserve the original affinity-to-binary conversion and split protocol. |
-| Yamanishi 08 | [TDC DTI tasks](https://tdcommons.ai/multi_pred_tasks/drug_target_interaction/) | Select the Yamanishi 08 family and retain compound/target identifiers before mapping. |
-| Hetionet | [Hetionet v1.0](https://github.com/hetio/hetionet) | Download the graph release and build fold-specific DTI/KGE inputs. |
-| Activation / Inhibition | [TDC DTI tasks](https://tdcommons.ai/multi_pred_tasks/drug_target_interaction/) | These are entity-aware binary protocols; keep the activity type and source metadata. |
-
-TDC is a convenient acquisition/normalization route, not a replacement for the
-paper protocol. Record the exact source version, download date, license, and
-any filtering or negative-sampling script in your experiment directory. For
-DrugBank, users must obtain the files directly from DrugBank. The repository
-does not include benchmark data, pretrained encoder weights, or trained
-checkpoints.
+See the [benchmark download table](../README.md#download-the-benchmark-data)
+for release files and labels. Record the source revision, download date,
+license, and any filtering or negative-sampling script used in the run.
 
 ### 2. Prepare the pair CSV
 
@@ -118,10 +103,9 @@ feature extraction and verify that the held-out compounds or targets do not
 occur in the training partition. The release does not infer entity-disjoint
 splits from an arbitrary CSV.
 
-For pairwise-random DrugBank/Davis/KIBA experiments, use the fixed split
-defined by the corresponding config. For warm-start, compound-disjoint, and
-target-disjoint experiments, use the matching file under `configs/paper/` and
-store the split-generation manifest alongside the CSV.
+The YAML files under `configs/paper/` configure the training run; they do not
+generate or include split assignments. Match the YAML to the dataset and
+regime, and retain the split manifest alongside the CSV.
 
 ### 3. Extract pooled encoder features
 
@@ -177,8 +161,8 @@ defdti evaluate \
   --predictions runs/davis/test_predictions.csv
 ```
 
-`train` selects the checkpoint by validation AUPRC. `predict --split 1` writes
-validation predictions and `predict --split 2` writes test predictions. Do not
+`train` selects the checkpoint by validation AUPRC. `predict-pairs --split 1` writes
+validation predictions and `predict-pairs --split 2` writes test predictions. Do not
 fit thresholds, temperature scaling, or any other calibration parameter on the
 test split. If calibration is required, first write validation and test
 prediction CSVs and run:

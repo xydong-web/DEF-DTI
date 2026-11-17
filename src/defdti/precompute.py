@@ -6,7 +6,6 @@ from typing import Any
 import numpy as np
 import torch
 
-
 DEFAULT_ENCODERS = {
     "smiles": "ibm-research/MoLFormer-XL-both-10pct",
     "text": "laituan245/molt5-base",
@@ -33,7 +32,7 @@ def encode_texts(
     """Encode strings with a Hugging Face encoder and mask-aware mean pooling."""
 
     try:
-        from transformers import AutoModel, AutoTokenizer
+        from transformers import AutoConfig, AutoModel, AutoTokenizer, T5EncoderModel
     except ImportError as exc:  # pragma: no cover - exercised only with optional deps
         raise RuntimeError(
             "Representation extraction requires `pip install -e '.[encoders]'`."
@@ -41,8 +40,15 @@ def encode_texts(
     device_obj = torch.device(
         device if device is not None else ("cuda" if torch.cuda.is_available() else "cpu")
     )
+    config = AutoConfig.from_pretrained(model_name, trust_remote_code=trust_remote_code)
     tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=trust_remote_code)
-    model = AutoModel.from_pretrained(model_name, trust_remote_code=trust_remote_code).to(device_obj)
+    # MolT5 is distributed as an encoder-decoder checkpoint; pooling uses only the encoder.
+    if config.model_type == "t5":
+        model = T5EncoderModel.from_pretrained(model_name, config=config).to(device_obj)
+    else:
+        model = AutoModel.from_pretrained(
+            model_name, config=config, trust_remote_code=trust_remote_code
+        ).to(device_obj)
     model.eval()
     outputs: list[np.ndarray] = []
     for start in range(0, len(texts), batch_size):

@@ -5,19 +5,19 @@ weights. Users must obtain each source under its original terms.
 
 ## Where to download inputs
 
-Use the following source pages and check their current licenses before use:
+See the [benchmark download table](../README.md#download-the-benchmark-data)
+for the seven pair datasets, exact filenames, label definitions, and split
+protocols. Obtain encoder checkpoints separately:
 
 | Input | Source | Required material |
 |---|---|---|
-| DrugBank | [DrugBank releases](https://go.drugbank.com/releases/latest) | licensed compound-target pairs, structures, and target sequences |
-| Davis, KIBA, Yamanishi 08 | [DeepDTA data](https://github.com/hkmztrk/DeepDTA/tree/master/data) | pair labels, SMILES, protein sequences, and the declared split |
-| Hetionet | [Hetionet repository](https://github.com/hetio/hetionet) | relations and compound-target edges |
-| Activation, Inhibition | The supplementary/source data for the corresponding benchmark publication | pair labels, structures, sequences, and splits |
 | MoLFormer | [Hugging Face](https://huggingface.co/ibm-research/MoLFormer-XL-both-10pct) | canonical-SMILES embeddings |
-| MolT5 | [Hugging Face](https://huggingface.co/laituan245/molt5-base) | `SMILES=` molecular-text embeddings |
+| MolT5 | [Hugging Face](https://huggingface.co/laituan245/molt5-base) | encoder-only `SMILES=` molecular-text embeddings |
 | ESM-2 | [Hugging Face](https://huggingface.co/facebook/esm2_t33_650M_UR50D) | protein-sequence embeddings |
+| OptimusKG V3.2 | [Harvard Dataverse](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi%3A10.7910%2FDVN%2FIYNGEV&version=3.2) | nodes, edges, and entity mappings for graph workflows; the pair-only trainer does not require the graph |
 
-`defdti precompute` downloads the three Hugging Face models automatically.
+`defdti precompute` downloads the three Hugging Face models on first use.
+Install `.[encoders,chem]` with a PyTorch 2.6 build for this workflow.
 Benchmark downloads are intentionally manual because DrugBank is licensed data
 and the other benchmarks use different identifiers and redistribution terms.
 Keep raw files outside Git and record source version, checksum, and license.
@@ -68,7 +68,9 @@ The CLI expects one row per compound-target pair, with `smiles`,
 `protein_sequence`, `label`, and `split` columns. Labels are binary. For
 compound-disjoint or target-disjoint evaluation, freeze the split before
 precomputation and ensure held-out entities do not occur in training. Preserve
-source identifiers in extra columns so predictions can be joined back later.
+source identifiers in the input CSV. The NPZ and pair-model predictions omit
+IDs; align the predictions to the original rows in the selected split before
+joining to other tables.
 
 ## Chemical preprocessing
 
